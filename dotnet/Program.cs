@@ -8,9 +8,24 @@ var builder = WebApplication.CreateBuilder(args);
 // Adiciona suporte a Controllers com Views
 builder.Services.AddControllersWithViews();
 
-// Configuração de Health Checks avançados (Live e Ready)
+// Configuração limpa de Health Checks (sem duplicidade e sem warning de BuildServiceProvider precoce)
 builder.Services.AddHealthChecks()
-    .AddDbContextCheck<AppDbContext>("Database", tags: new[] { "ready" });
+    .AddCheck("Database", () =>
+    {
+        try
+        {
+            // Usa o container de serviços após o build para verificar o banco de forma segura
+            using var scope = builder.Services.BuildServiceProvider().CreateScope();
+            var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+            return db.Database.CanConnect()
+                ? Microsoft.Extensions.Diagnostics.HealthChecks.HealthCheckResult.Healthy("Database is online")
+                : Microsoft.Extensions.Diagnostics.HealthChecks.HealthCheckResult.Unhealthy("Database is offline");
+        }
+        catch (Exception ex)
+        {
+            return Microsoft.Extensions.Diagnostics.HealthChecks.HealthCheckResult.Unhealthy("Database connection failed", ex);
+        }
+    }, tags: new[] { "ready" });
 
 var databaseUrl = Environment.GetEnvironmentVariable("DATABASE_URL");
 var connectionString = databaseUrl

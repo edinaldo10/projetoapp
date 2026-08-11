@@ -24,7 +24,7 @@ jobs:
       working-directory: ./dotnet
 
     - name: Compilar projeto
-      run: dotnet build --no-restore --configuration Release
+      run: dotnet build CloudApplication.csproj --no-restore --configuration Release
       working-directory: ./dotnet
 
     - name: Executar testes

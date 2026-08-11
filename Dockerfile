@@ -2,19 +2,20 @@
 FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 WORKDIR /src
 
-COPY ["cloud-application.csproj", "./"]
-RUN dotnet restore
+# Copia o arquivo do projeto de dentro da pasta dotnet/
+COPY ["dotnet/cloud-application.csproj", "./"]
+RUN dotnet restore "cloud-application.csproj"
 
-COPY . .
-RUN dotnet publish "cloud-application.csproj" -c Release -o /app/publish
+# Copia todo o resto do código da pasta dotnet/
+COPY dotnet/. .
+RUN dotnet publish "cloud-application.csproj" -c Release -o /app/publish /p:UseAppHost=false
 
-# Estágio Final / Runtime
-FROM mcr.microsoft.com/dotnet/aspnet:8.0
+# Estágio de Runtime (Final)
+FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS final
 WORKDIR /app
+RUN useradd -u 1000 appuser && chown -R appuser /app
+USER appuser
 COPY --from=build /app/publish .
-
-EXPOSE 8000
-ENV ASPNETCORE_URLS=http://0.0.0.0:8000
-
-# ATENÇÃO: O nome da DLL gerada é em minúsculas para corresponder ao csproj
+EXPOSE 8080
+ENV ASPNETCORE_URLS=http://+:8080
 ENTRYPOINT ["dotnet", "cloud-application.dll"]

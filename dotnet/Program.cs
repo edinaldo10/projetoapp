@@ -1,5 +1,6 @@
 using CloudApplication.Data;
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
+using Microsoft.Extensions.Diagnostics.HealthChecks; // <-- Adicione esta linha
 using Microsoft.EntityFrameworkCore;
 using Scalar.AspNetCore;
 

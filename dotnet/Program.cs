@@ -8,24 +8,9 @@ var builder = WebApplication.CreateBuilder(args);
 // Adiciona suporte a Controllers com Views
 builder.Services.AddControllersWithViews();
 
-// Configuração limpa de Health Checks (sem duplicidade e sem warning de BuildServiceProvider precoce)
+// 1. Apenas registra o Health Check básico (sem build prematuro)
 builder.Services.AddHealthChecks()
-    .AddCheck("Database", () =>
-    {
-        try
-        {
-            // Usa o container de serviços após o build para verificar o banco de forma segura
-            using var scope = builder.Services.BuildServiceProvider().CreateScope();
-            var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
-            return db.Database.CanConnect()
-                ? Microsoft.Extensions.Diagnostics.HealthChecks.HealthCheckResult.Healthy("Database is online")
-                : Microsoft.Extensions.Diagnostics.HealthChecks.HealthCheckResult.Unhealthy("Database is offline");
-        }
-        catch (Exception ex)
-        {
-            return Microsoft.Extensions.Diagnostics.HealthChecks.HealthCheckResult.Unhealthy("Database connection failed", ex);
-        }
-    }, tags: new[] { "ready" });
+    .AddCheck("Database", () => HealthCheckResult.Healthy(), tags: new[] { "ready" });
 
 var databaseUrl = Environment.GetEnvironmentVariable("DATABASE_URL");
 var connectionString = databaseUrl
@@ -86,15 +71,41 @@ app.UseStaticFiles();
 app.UseRouting();
 app.UseAuthorization();
 
-// Mapeamento dos Health Checks para Cloud-Native / DevOps
+// Mapeamento dos Health Checks usando o container oficial da aplicação (`app.Services`)
 app.MapHealthChecks("/health/live", new HealthCheckOptions
 {
-    Predicate = _ => false // Apenas valida se o processo da aplicação está rodando no ar
+    Predicate = _ => false
 });
 
 app.MapHealthChecks("/health/ready", new HealthCheckOptions
 {
-    Predicate = check => check.Tags.Contains("ready") // Valida se a aplicação e o banco de dados estão conectados
+    Predicate = check => check.Tags.Contains("ready"),
+    ResponseWriter = async (context, report) =>
+    {
+        context.Response.ContentType = "application/json";
+        try
+        {
+            // Valida a conexão usando o escopo real da aplicação já rodando
+            using var scope = app.Services.CreateScope();
+            var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+            var canConnect = await db.Database.CanConnectAsync();
+
+            if (canConnect)
+            {
+                await context.Response.WriteAsync("{\"status\":\"Healthy\",\"database\":\"Online\"}");
+            }
+            else
+            {
+                context.Response.StatusCode = StatusCodes.Status503ServiceUnavailable;
+                await context.Response.WriteAsync("{\"status\":\"Unhealthy\",\"database\":\"Offline\"}");
+            }
+        }
+        catch (Exception ex)
+        {
+            context.Response.StatusCode = StatusCodes.Status503ServiceUnavailable;
+            await context.Response.WriteAsync($"{{\"status\":\"Unhealthy\",\"error\":\"{ex.Message}\"}}");
+        }
+    }
 });
 
 // Rota padrão do MVC

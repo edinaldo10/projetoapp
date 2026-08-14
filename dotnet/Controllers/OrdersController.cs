@@ -53,11 +53,11 @@ public class OrdersController : Controller
     // POST: Orders/Create
     [HttpPost]
     [ValidateAntiForgeryToken]
-    public async Task<IActionResult> Create(OrderCreateViewModel model)
+    public async Task<IActionResult> Create(string customer)
     {
-        if (!ModelState.IsValid)
+        if (string.IsNullOrWhiteSpace(customer))
         {
-            TempData["ErrorMessage"] = "Dados inválidos para criação do pedido.";
+            TempData["ErrorMessage"] = "O nome do cliente é obrigatório.";
             return RedirectToAction(nameof(Index));
         }
 
@@ -65,7 +65,7 @@ public class OrdersController : Controller
         {
             var order = new Order
             {
-                Customer = model.Customer,
+                Customer = customer,
                 Status = "Created",
                 CreatedAt = DateTime.UtcNow
             };
@@ -132,7 +132,7 @@ public class OrdersController : Controller
         return RedirectToAction(nameof(Index));
     }
 
-    // POST: Orders/Delete/5 (Exclus o Real ou L gica)
+    // POST: Orders/Delete/5
     [HttpPost]
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Delete(string id)
@@ -145,11 +145,11 @@ public class OrdersController : Controller
                 _context.Items.RemoveRange(order.Items);
                 _context.Orders.Remove(order);
                 await _context.SaveChangesAsync();
-                TempData["SuccessMessage"] = "Pedido exclu do com sucesso!";
+                TempData["SuccessMessage"] = "Pedido excluído com sucesso!";
             }
             else
             {
-                TempData["ErrorMessage"] = "Pedido n o encontrado.";
+                TempData["ErrorMessage"] = "Pedido não encontrado.";
             }
         }
         catch (Exception ex)

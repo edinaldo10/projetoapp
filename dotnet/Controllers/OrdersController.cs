@@ -88,7 +88,7 @@ public class OrdersController : Controller
     {
         if (string.IsNullOrEmpty(id)) return NotFound();
 
-        var order = await _context.Orders.FindAsync(id);
+        var order = await _context.Orders.FirstOrDefaultAsync(o => EF.Property<string>(o, "Id") == id);
         if (order == null) return NotFound();
 
         var model = new OrderUpdateViewModel
@@ -112,7 +112,7 @@ public class OrdersController : Controller
 
         try
         {
-            var order = await _context.Orders.FindAsync(id);
+            var order = await _context.Orders.FirstOrDefaultAsync(o => EF.Property<string>(o, "Id") == id);
             if (order == null) return NotFound();
 
             order.Customer = model.Customer;
@@ -139,7 +139,10 @@ public class OrdersController : Controller
     {
         try
         {
-            var order = await _context.Orders.Include(o => o.Items).FirstOrDefaultAsync(o => o.Id == id);
+            var order = await _context.Orders
+                .Include(o => o.Items)
+                .FirstOrDefaultAsync(o => EF.Property<string>(o, "Id") == id);
+
             if (order != null)
             {
                 _context.Items.RemoveRange(order.Items);
@@ -168,7 +171,7 @@ public class OrdersController : Controller
     {
         try
         {
-            var order = await _context.Orders.FindAsync(orderId);
+            var order = await _context.Orders.FirstOrDefaultAsync(o => EF.Property<string>(o, "Id") == orderId);
             if (order == null) return NotFound();
 
             var item = new Item

@@ -14,7 +14,7 @@ public class AppDbContext : DbContext
     {
         base.OnModelCreating(modelBuilder);
 
-        // Mapeamento exato para a tabela orders e suas colunas
+        // Mapeamento fluído explícito para Order
         modelBuilder.Entity<Order>(entity =>
         {
             entity.ToTable("orders", schema: "public");
@@ -24,7 +24,7 @@ public class AppDbContext : DbContext
             entity.Property(e => e.CreatedAt).HasColumnName("created_at");
         });
 
-        // Mapeamento exato para a tabela items e suas colunas
+        // Mapeamento fluído explícito para Item
         modelBuilder.Entity<Item>(entity =>
         {
             entity.ToTable("items", schema: "public");

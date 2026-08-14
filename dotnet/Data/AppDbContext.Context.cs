@@ -34,7 +34,8 @@ public class AppDbContext : DbContext
             entity.Property(e => e.description).HasColumnName("description");
             entity.Property(e => e.quantity).HasColumnName("quantity");
 
-            entity.HasOne<Order>()
+            // Mapeamento correto utilizando a navegação da entidade Order
+            entity.HasOne(i => i.order)
                   .WithMany(o => o.Items)
                   .HasForeignKey(i => i.order_id)
                   .OnDelete(DeleteBehavior.Cascade);

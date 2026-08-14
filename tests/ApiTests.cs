@@ -21,6 +21,7 @@ public class CustomWebApplicationFactory : WebApplicationFactory<Program>
     {
         builder.ConfigureServices(services =>
         {
+            // Remove o registro real do DbContext
             var descriptors = services.Where(
                 d => d.ServiceType == typeof(DbContextOptions<AppDbContext>) ||
                      d.ServiceType == typeof(DbContextOptions)).ToList();
@@ -30,17 +31,22 @@ public class CustomWebApplicationFactory : WebApplicationFactory<Program>
                 services.Remove(descriptor);
             }
 
+            // Abre uma conexão SQLite em memória compartilhada
             _connection = new SqliteConnection("DataSource=:memory:;Cache=Shared");
             _connection.Open();
 
+            // Adiciona o AppDbContext apontando para o SQLite
             services.AddDbContext<AppDbContext>(options =>
             {
                 options.UseSqlite(_connection);
             });
 
+            // Cria o banco de dados e as tabelas para os testes
             var sp = services.BuildServiceProvider();
             using var scope = sp.CreateScope();
             var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+
+            // Garante que o banco seja criado limpo
             db.Database.EnsureCreated();
         });
     }

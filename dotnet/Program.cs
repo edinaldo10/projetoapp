@@ -46,7 +46,8 @@ builder.Services.AddDbContext<AppDbContext>(options =>
     }
     else
     {
-        options.UseNpgsql(connectionString);
+        options.UseNpgsql(connectionString)
+               .UseSnakeCaseNamingConvention(); // <- Adicionado para converter automaticamente propriedades para snake_case no Postgres
     }
 });
 

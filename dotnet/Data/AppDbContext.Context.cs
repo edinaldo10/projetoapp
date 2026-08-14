@@ -14,7 +14,7 @@ public class AppDbContext : DbContext
     {
         base.OnModelCreating(modelBuilder);
 
-        // Mapeamento fluído explícito para Order
+        // Mapeamento explícito de Order com Npgsql
         modelBuilder.Entity<Order>(entity =>
         {
             entity.ToTable("orders", schema: "public");
@@ -24,7 +24,7 @@ public class AppDbContext : DbContext
             entity.Property(e => e.CreatedAt).HasColumnName("created_at");
         });
 
-        // Mapeamento fluído explícito para Item
+        // Mapeamento explícito de Item com Npgsql
         modelBuilder.Entity<Item>(entity =>
         {
             entity.ToTable("items", schema: "public");

@@ -23,19 +23,19 @@ public class OrdersController : Controller
         {
             var orders = await _context.Orders
                 .Include(o => o.Items)
-                .OrderByDescending(o => o.CreatedAt)
+                .OrderByDescending(o => o.created_at)
                 .Select(o => new OrderDetailsViewModel
                 {
-                    Id = o.Id,
-                    Customer = o.Customer,
-                    Status = o.Status,
-                    CreatedAt = o.CreatedAt,
-                    Items = o.Items.Select(i => new ItemViewModel
+                    id = o.id,
+                    customer = o.customer,
+                    status = o.status,
+                    createdAt = o.created_at,
+                    items = o.Items.Select(i => new ItemViewModel
                     {
-                        Id = i.Id,
-                        Sku = i.Sku,
-                        Description = i.Description,
-                        Quantity = i.Quantity
+                        id = i.id,
+                        sku = i.sku,
+                        description = i.description,
+                        quantity = i.quantity
                     }).ToList()
                 })
                 .ToListAsync();
@@ -65,9 +65,9 @@ public class OrdersController : Controller
         {
             var order = new Order
             {
-                Customer = customer,
-                Status = "Created",
-                CreatedAt = DateTime.UtcNow
+                customer = customer,
+                status = "Created",
+                createdAt = DateTime.UtcNow
             };
 
             _context.Orders.Add(order);
@@ -88,14 +88,14 @@ public class OrdersController : Controller
     {
         if (string.IsNullOrEmpty(id)) return NotFound();
 
-        var order = await _context.Orders.FirstOrDefaultAsync(o => EF.Property<string>(o, "Id") == id);
+        var order = await _context.Orders.FirstOrDefaultAsync(o => EF.Property<string>(o, "id") == id);
         if (order == null) return NotFound();
 
         var model = new OrderUpdateViewModel
         {
-            Id = order.Id,
-            Customer = order.Customer,
-            Status = order.Status
+            id = order.id,
+            customer = order.customer,
+            status = order.status
         };
 
         return View(model);
@@ -106,17 +106,17 @@ public class OrdersController : Controller
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Edit(string id, OrderUpdateViewModel model)
     {
-        if (id != model.Id) return NotFound();
+        if (id != model.id) return NotFound();
 
         if (!ModelState.IsValid) return View(model);
 
         try
         {
-            var order = await _context.Orders.FirstOrDefaultAsync(o => EF.Property<string>(o, "Id") == id);
+            var order = await _context.Orders.FirstOrDefaultAsync(o => EF.Property<string>(o, "id") == id);
             if (order == null) return NotFound();
 
-            order.Customer = model.Customer;
-            order.Status = model.Status;
+            order.customer = model.customer;
+            order.status = model.status;
 
             _context.Update(order);
             await _context.SaveChangesAsync();
@@ -140,8 +140,8 @@ public class OrdersController : Controller
         try
         {
             var order = await _context.Orders
-                .Include(o => o.Items)
-                .FirstOrDefaultAsync(o => EF.Property<string>(o, "Id") == id);
+                .Include(o => o.items)
+                .FirstOrDefaultAsync(o => EF.Property<string>(o, "id") == id);
 
             if (order != null)
             {
@@ -167,19 +167,19 @@ public class OrdersController : Controller
     // POST: Orders/AddItem
     [HttpPost]
     [ValidateAntiForgeryToken]
-    public async Task<IActionResult> AddItem(string orderId, string sku, string description, int quantity)
+    public async Task<IActionResult> AddItem(string orderid, string sku, string description, int quantity)
     {
         try
         {
-            var order = await _context.Orders.FirstOrDefaultAsync(o => EF.Property<string>(o, "Id") == orderId);
+            var order = await _context.Orders.FirstOrDefaultAsync(o => EF.Property<string>(o, "id") == orderid);
             if (order == null) return NotFound();
 
             var item = new Item
             {
-                OrderId = orderId,
-                Sku = sku,
-                Description = description,
-                Quantity = quantity
+                orderid = order_id,
+                sku = sku,
+                description = description,
+                quantity = quantity
             };
 
             _context.Items.Add(item);

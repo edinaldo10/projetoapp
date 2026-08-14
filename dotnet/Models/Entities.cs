@@ -47,7 +47,5 @@ public class Item
     public int quantity { get; set; }
 
     [ForeignKey("order_id")]
-    public Order order { get; set; } = null!;
+    public Order? order { get; set; }
 }
-
-

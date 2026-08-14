@@ -9,6 +9,9 @@ var builder = WebApplication.CreateBuilder(args);
 // Adiciona suporte a Controllers com Views
 builder.Services.AddControllersWithViews();
 
+// Adiciona suporte ao OpenAPI para gerar a especificação consumida pelo Scalar
+builder.Services.AddOpenApi();
+
 // 1. Apenas registra o Health Check básico (sem build prematuro)
 builder.Services.AddHealthChecks()
     .AddCheck("Database", () => HealthCheckResult.Healthy(), tags: new[] { "ready" });
@@ -71,6 +74,9 @@ app.UseHttpsRedirection();
 app.UseStaticFiles();
 app.UseRouting();
 app.UseAuthorization();
+
+// Mapeia os endpoints do OpenAPI (necessário para o Scalar funcionar integrado)
+app.MapOpenApi();
 
 // Mapeamento dos Health Checks usando o container oficial da aplicação (`app.Services`)
 app.MapHealthChecks("/health/live", new HealthCheckOptions

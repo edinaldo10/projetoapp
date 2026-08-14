@@ -85,7 +85,7 @@ public class OrdersController : Controller
     {
         if (string.IsNullOrEmpty(id)) return NotFound();
 
-        var order = await _context.Orders.FirstOrDefaultAsync(o => EF.Property<string>(o, "id") == id);
+        var order = await _context.Orders.FirstOrDefaultAsync(o => o.id == id);
         if (order == null) return NotFound();
 
         var model = new OrderUpdateViewModel
@@ -108,7 +108,7 @@ public class OrdersController : Controller
 
         try
         {
-            var order = await _context.Orders.FirstOrDefaultAsync(o => EF.Property<string>(o, "id") == id);
+            var order = await _context.Orders.FirstOrDefaultAsync(o => o.id == id);
             if (order == null) return NotFound();
 
             order.customer = model.customer;
@@ -136,7 +136,7 @@ public class OrdersController : Controller
         {
             var order = await _context.Orders
                 .Include(o => o.Items)
-                .FirstOrDefaultAsync(o => EF.Property<string>(o, "id") == id);
+                .FirstOrDefaultAsync(o => o.id == id);
 
             if (order != null)
             {
@@ -165,7 +165,7 @@ public class OrdersController : Controller
     {
         try
         {
-            var order = await _context.Orders.FirstOrDefaultAsync(o => EF.Property<string>(o, "id") == orderId);
+            var order = await _context.Orders.FirstOrDefaultAsync(o => o.id == orderId);
             if (order == null) return NotFound();
 
             var item = new Item

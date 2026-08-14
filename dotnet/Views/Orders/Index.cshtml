@@ -17,6 +17,7 @@
             <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
         </div>
     }
+
         @if (TempData["ErrorMessage"] != null)
     {
         <div class="alert alert-danger alert-dismissible fade show" role="alert">
@@ -80,6 +81,7 @@
                                 </form>
                             </td>
                         </tr>
+
  <!-- Linha expansível para itens -->
                         <tr class="collapse bg-light" id="items-@order.id">
                             <td colspan="5">
@@ -94,6 +96,7 @@
                                         </li>
                                             }
                                     </ul>
+
                                     <!-- Adicionar Item -->
                                     <form asp-action="AddItem" method="post" class="row g-2">
                                         <input type="hidden" name="orderId" value="@order.id" />

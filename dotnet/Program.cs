@@ -9,9 +9,7 @@ var builder = WebApplication.CreateBuilder(args);
 // Adiciona suporte a Controllers com Views
 builder.Services.AddControllersWithViews();
 
-// Adiciona o gerador de API Explorer necessário para documentação
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
 
 // 1. Registra o Health Check básico
 builder.Services.AddHealthChecks()
@@ -115,17 +113,10 @@ app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Orders}/{action=Index}/{id?}");
 
-// Habilita o Swagger JSON (necessário para o Scalar ler a especificação)
-app.UseSwagger(options =>
-{
-    options.RouteTemplate = "openapi/{documentName}/openapi.json";
-});
-
-// Documentação Scalar integrada
+// Documentação Scalar integrada nativamente
 app.MapScalarApiReference(options =>
 {
     options.Title = "API de Pedidos (.NET)";
-    options.WithOpenApiRoutePattern("/openapi/v1/openapi.json");
 });
 
 app.Run();

@@ -14,8 +14,8 @@ public class AppDbContext : DbContext
     {
         base.OnModelCreating(modelBuilder);
 
-        // Mapeia explicitamente as tabelas para minúsculo, compatível com PostgreSQL
-        modelBuilder.Entity<Order>().ToTable("orders");
-        modelBuilder.Entity<Item>().ToTable("items");
+        // Força explicitamente o nome exato da tabela e o schema no PostgreSQL
+        modelBuilder.Entity<Order>().ToTable("orders", schema: "public");
+        modelBuilder.Entity<Item>().ToTable("items", schema: "public");
     }
 }

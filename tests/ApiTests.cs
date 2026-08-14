@@ -90,6 +90,8 @@ public class ApiTests : IClassFixture<CustomWebApplicationFactory>
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
 
         var html = await response.Content.ReadAsStringAsync();
-        Assert.False(string.IsNullOrEmpty(html));
+
+        // Forma correta: Assert.True garante que a string não é vazia
+        Assert.True(!string.IsNullOrEmpty(html));
     }
 }

@@ -26,19 +26,19 @@
     }
 
         <!-- Criar Pedido -->
-        <div class="card shadow-sm mb-4">
-            <div class="card-body">
-                <h5 class="card-title text-primary mb-3">Novo Pedido</h5>
-                <form asp-action="Create" method="post" class="row g-3">
-                    <div class="col-md-8">
-                        <input type="text" name="Customer" class="form-control" placeholder="Nome do Cliente" required />
-                    </div>
-                    <div class="col-md-4">
-                        <button type="submit" class="btn btn-primary w-100">Criar Pedido</button>
-                    </div>
-                </form>
-            </div>
-        </div>
+	<div class="card shadow-sm mb-4">
+    		<div class="card-body">
+        		<h5 class="card-title text-primary mb-3">Novo Pedido</h5>
+        		<form asp-action="Create" method="post" class="row g-3">
+            			<div class="col-md-8">
+                			<input type="text" asp-for="Customer" class="form-control" placeholder="Nome do Cliente" required />
+            			</div>
+            			<div class="col-md-4">
+                			<button type="submit" class="btn btn-primary w-100">Criar Pedido</button>
+            			</div>
+        		</form>
+    		</div>
+	</div>
 
         <!-- Tabela de Pedidos -->
         <div class="card shadow-sm">

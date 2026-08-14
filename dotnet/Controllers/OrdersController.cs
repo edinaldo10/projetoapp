@@ -57,7 +57,7 @@ public class OrdersController : Controller
     {
         if (!ModelState.IsValid)
         {
-            TempData["ErrorMessage"] = "Dados inválidos para criação do pedido.";
+            TempData["ErrorMessage"] = "Dados invÃ¡lidos para criaÃ§Ã£o do pedido.";
             return RedirectToAction(nameof(Index));
         }
 
@@ -132,7 +132,7 @@ public class OrdersController : Controller
         return RedirectToAction(nameof(Index));
     }
 
-    // POST: Orders/Delete/5 (Exclusão Real ou Lógica)
+    // POST: Orders/Delete/5 (Exclus o Real ou L gica)
     [HttpPost]
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Delete(string id)
@@ -145,11 +145,11 @@ public class OrdersController : Controller
                 _context.Items.RemoveRange(order.Items);
                 _context.Orders.Remove(order);
                 await _context.SaveChangesAsync();
-                TempData["SuccessMessage"] = "Pedido excluído com sucesso!";
+                TempData["SuccessMessage"] = "Pedido exclu do com sucesso!";
             }
             else
             {
-                TempData["ErrorMessage"] = "Pedido não encontrado.";
+                TempData["ErrorMessage"] = "Pedido n o encontrado.";
             }
         }
         catch (Exception ex)

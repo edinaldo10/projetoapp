@@ -63,6 +63,7 @@ public class OrdersController : Controller
         {
             var order = new Order
             {
+                id = Guid.NewGuid().ToString(), // Garante que o ID nunca vá vazio para o banco
                 customer = customer,
                 status = "Created",
                 created_at = DateTime.UtcNow
@@ -74,8 +75,9 @@ public class OrdersController : Controller
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Erro ao criar pedido.");
-            TempData["ErrorMessage"] = "Erro interno ao salvar o pedido.";
+            // Se houver erro, mostre o erro real no log para facilitar o rastreio
+            _logger.LogError(ex, "Erro ao criar pedido para o cliente {Customer}", customer);
+            TempData["ErrorMessage"] = $"Erro interno ao salvar o pedido: {ex.Message}";
         }
 
         return RedirectToAction(nameof(Index));

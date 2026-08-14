@@ -9,10 +9,11 @@ var builder = WebApplication.CreateBuilder(args);
 // Adiciona suporte a Controllers com Views
 builder.Services.AddControllersWithViews();
 
-// Adiciona suporte ao OpenAPI para gerar a especificação consumida pelo Scalar
-builder.Services.AddOpenApi();
+// Adiciona o gerador de API Explorer necessário para documentação
+builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddSwaggerGen();
 
-// 1. Apenas registra o Health Check básico (sem build prematuro)
+// 1. Registra o Health Check básico
 builder.Services.AddHealthChecks()
     .AddCheck("Database", () => HealthCheckResult.Healthy(), tags: new[] { "ready" });
 
@@ -53,8 +54,6 @@ builder.Services.AddDbContext<AppDbContext>(options =>
     }
 });
 
-builder.Services.AddEndpointsApiExplorer();
-
 var app = builder.Build();
 
 // Garantir criação do banco ao iniciar
@@ -75,10 +74,7 @@ app.UseStaticFiles();
 app.UseRouting();
 app.UseAuthorization();
 
-// Mapeia os endpoints do OpenAPI (necessário para o Scalar funcionar integrado)
-app.MapOpenApi();
-
-// Mapeamento dos Health Checks usando o container oficial da aplicação (`app.Services`)
+// Mapeamento dos Health Checks
 app.MapHealthChecks("/health/live", new HealthCheckOptions
 {
     Predicate = _ => false
@@ -92,7 +88,6 @@ app.MapHealthChecks("/health/ready", new HealthCheckOptions
         context.Response.ContentType = "application/json";
         try
         {
-            // Valida a conexão usando o escopo real da aplicação já rodando
             using var scope = app.Services.CreateScope();
             var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
             var canConnect = await db.Database.CanConnectAsync();
@@ -120,10 +115,17 @@ app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Orders}/{action=Index}/{id?}");
 
-// Documentação Scalar
+// Habilita o Swagger JSON (necessário para o Scalar ler a especificação)
+app.UseSwagger(options =>
+{
+    options.RouteTemplate = "openapi/{documentName}/openapi.json";
+});
+
+// Documentação Scalar integrada
 app.MapScalarApiReference(options =>
 {
     options.Title = "API de Pedidos (.NET)";
+    options.WithOpenApiRoutePattern("/openapi/v1/openapi.json");
 });
 
 app.Run();

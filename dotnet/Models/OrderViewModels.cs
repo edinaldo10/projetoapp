@@ -1,3 +1,7 @@
+using System.ComponentModel.DataAnnotations;
+
+namespace CloudApplication.Models;
+
 public class OrderCreateViewModel
 {
     [Required(ErrorMessage = "O nome do cliente é obrigatório.")]
@@ -30,8 +34,13 @@ public class OrderDetailsViewModel
 public class ItemViewModel
 {
     public string id { get; set; } = string.Empty;
-    [Required] public string sku { get; set; } = string.Empty;
-    [Required] public string description { get; set; } = string.Empty;
+
+    [Required]
+    public string sku { get; set; } = string.Empty;
+
+    [Required]
+    public string description { get; set; } = string.Empty;
+
     [Range(1, int.MaxValue, ErrorMessage = "A quantidade deve ser maior que zero.")]
     public int quantity { get; set; }
 }

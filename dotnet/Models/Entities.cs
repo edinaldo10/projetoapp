@@ -1,3 +1,8 @@
+using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
+
+namespace CloudApplication.Models;
+
 [Table("orders", Schema = "public")]
 public class Order
 {

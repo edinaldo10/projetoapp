@@ -20,31 +20,34 @@ public class OrdersController : Controller
     {
         try
         {
+            // Buscamos tudo de forma simples primeiro para garantir que o dado aparece
             var orders = await _context.Orders
                 .Include(o => o.Items)
                 .OrderByDescending(o => o.created_at)
-                .Select(o => new OrderDetailsViewModel
-                {
-                    id = o.id,
-                    customer = o.customer,
-                    status = o.status,
-                    created_at = o.created_at,
-                    Items = o.Items.Select(i => new ItemViewModel
-                    {
-                        id = i.id,
-                        sku = i.sku,
-                        description = i.description,
-                        quantity = i.quantity
-                    }).ToList()
-                })
                 .ToListAsync();
 
-            return View(orders);
+            // Mapeamos manualmente para o ViewModel que sua View espera
+            var model = orders.Select(o => new OrderDetailsViewModel
+            {
+                id = o.id ?? "sem-id",
+                customer = o.customer ?? "Cliente Anônimo",
+                status = o.status ?? "Pendente",
+                created_at = o.created_at,
+                Items = o.Items?.Select(i => new ItemViewModel
+                {
+                    id = i.id,
+                    sku = i.sku,
+                    description = i.description,
+                    quantity = i.quantity
+                }).ToList() ?? new List<ItemViewModel>()
+            }).ToList();
+
+            return View(model);
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, "Erro ao listar pedidos.");
-            TempData["ErrorMessage"] = "Erro ao carregar os pedidos.";
+            TempData["ErrorMessage"] = "Erro ao carregar os pedidos: " + ex.Message;
             return View(new List<OrderDetailsViewModel>());
         }
     }

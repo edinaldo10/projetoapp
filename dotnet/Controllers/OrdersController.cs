@@ -16,7 +16,6 @@ public class OrdersController : Controller
         _logger = logger;
     }
 
-    // GET: Orders (Listagem)
     public async Task<IActionResult> Index()
     {
         try
@@ -29,8 +28,8 @@ public class OrdersController : Controller
                     id = o.id,
                     customer = o.customer,
                     status = o.status,
-                    createdAt = o.created_at,
-                    items = o.Items.Select(i => new ItemViewModel
+                    created_at = o.created_at,
+                    Items = o.Items.Select(i => new ItemViewModel
                     {
                         id = i.id,
                         sku = i.sku,
@@ -50,7 +49,6 @@ public class OrdersController : Controller
         }
     }
 
-    // POST: Orders/Create
     [HttpPost]
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Create(string customer)
@@ -67,7 +65,7 @@ public class OrdersController : Controller
             {
                 customer = customer,
                 status = "Created",
-                createdAt = DateTime.UtcNow
+                created_at = DateTime.UtcNow
             };
 
             _context.Orders.Add(order);
@@ -83,7 +81,6 @@ public class OrdersController : Controller
         return RedirectToAction(nameof(Index));
     }
 
-    // GET: Orders/Edit/5
     public async Task<IActionResult> Edit(string id)
     {
         if (string.IsNullOrEmpty(id)) return NotFound();
@@ -101,7 +98,6 @@ public class OrdersController : Controller
         return View(model);
     }
 
-    // POST: Orders/Edit/5
     [HttpPost]
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Edit(string id, OrderUpdateViewModel model)
@@ -132,7 +128,6 @@ public class OrdersController : Controller
         return RedirectToAction(nameof(Index));
     }
 
-    // POST: Orders/Delete/5
     [HttpPost]
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Delete(string id)
@@ -140,7 +135,7 @@ public class OrdersController : Controller
         try
         {
             var order = await _context.Orders
-                .Include(o => o.items)
+                .Include(o => o.Items)
                 .FirstOrDefaultAsync(o => EF.Property<string>(o, "id") == id);
 
             if (order != null)
@@ -164,19 +159,18 @@ public class OrdersController : Controller
         return RedirectToAction(nameof(Index));
     }
 
-    // POST: Orders/AddItem
     [HttpPost]
     [ValidateAntiForgeryToken]
-    public async Task<IActionResult> AddItem(string orderid, string sku, string description, int quantity)
+    public async Task<IActionResult> AddItem(string orderId, string sku, string description, int quantity)
     {
         try
         {
-            var order = await _context.Orders.FirstOrDefaultAsync(o => EF.Property<string>(o, "id") == orderid);
+            var order = await _context.Orders.FirstOrDefaultAsync(o => EF.Property<string>(o, "id") == orderId);
             if (order == null) return NotFound();
 
             var item = new Item
             {
-                orderid = order_id,
+                order_id = orderId,
                 sku = sku,
                 description = description,
                 quantity = quantity

@@ -14,25 +14,23 @@ public class AppDbContext : DbContext
     {
         base.OnModelCreating(modelBuilder);
 
-        // Mapeamento explícito de Order com Npgsql
         modelBuilder.Entity<Order>(entity =>
         {
             entity.ToTable("orders", schema: "public");
-            entity.Property(e => e.Id).HasColumnName("id");
-            entity.Property(e => e.Customer).HasColumnName("customer");
-            entity.Property(e => e.Status).HasColumnName("status");
-            entity.Property(e => e.CreatedAt).HasColumnName("created_at");
+            entity.Property(e => e.id).HasColumnName("id");
+            entity.Property(e => e.customer).HasColumnName("customer");
+            entity.Property(e => e.status).HasColumnName("status");
+            entity.Property(e => e.created_at).HasColumnName("created_at");
         });
 
-        // Mapeamento explícito de Item com Npgsql
         modelBuilder.Entity<Item>(entity =>
         {
             entity.ToTable("items", schema: "public");
-            entity.Property(e => e.Id).HasColumnName("id");
-            entity.Property(e => e.OrderId).HasColumnName("order_id");
-            entity.Property(e => e.Sku).HasColumnName("sku");
-            entity.Property(e => e.Description).HasColumnName("description");
-            entity.Property(e => e.Quantity).HasColumnName("quantity");
+            entity.Property(e => e.id).HasColumnName("id");
+            entity.Property(e => e.order_id).HasColumnName("order_id");
+            entity.Property(e => e.sku).HasColumnName("sku");
+            entity.Property(e => e.description).HasColumnName("description");
+            entity.Property(e => e.quantity).HasColumnName("quantity");
         });
     }
 }
